@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">krab</string>
+    <string name="guide">사용방법</string>
+    <string name="login">로그인하러 가기</string>
 </resources>

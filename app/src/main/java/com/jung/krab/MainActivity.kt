@@ -15,9 +15,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.viewModelFactory
+import androidx.navigation.compose.rememberNavController
 import com.jung.krab.core.network.Repository
 import com.jung.krab.core.network.RetrofitBuilder
 import com.jung.krab.dto.ApiResult
+import com.jung.krab.ui.navigation.navigation
+import com.jung.krab.ui.page.tutorial.TutorialPage
 import com.jung.krab.ui.theme.KrabTheme
 import com.jung.krab.utils.LogUtils
 import kotlinx.coroutines.flow.collectLatest
@@ -25,53 +28,20 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
-    val repository = Repository(RetrofitBuilder())
-    val viewModelFactory = ViewModelFactory(repository)
-    lateinit var viewModel: MainViewModel
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        viewModel = ViewModelProvider(this, viewModelFactory)[MainViewModel::class.java]
-        lifecycleScope.launch {
-            viewModel.getData().collectLatest { result ->
-                if(result is ApiResult.Success){
-                    LogUtils.debug(result.data.id)
-                    LogUtils.debug(result.data.joke)
-                    LogUtils.debug(result.data.status.toString())
-                }else if(result is ApiResult.Exception){
-                    result.e.message?.let { LogUtils.error(it) }
-                }
-            }
-        }
 
         setContent {
+            val navController = rememberNavController()
             KrabTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
+                    navigation(
+                        modifier = Modifier.padding(innerPadding),
+                        navController = navController
                     )
                 }
             }
         }
     }
 }
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    LogUtils.debug("S")
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    KrabTheme {
-        Greeting("Android")
-    }
-}
-
